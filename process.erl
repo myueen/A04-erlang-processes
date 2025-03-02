@@ -38,8 +38,6 @@ start() ->
     Pid1 = spawn(?MODULE, serv1, [Pid2]),
     
     loop(Pid1),
-    % loop(Pid2),
-    % loop(Pid3),
     okay.
 
  loop(P) ->
