@@ -33,9 +33,9 @@ serv1(Pid2) -> receive
     end.
 
 start() ->
-    Pid3 = spawn(?MODULE, serv3(0), []),
-    Pid2 = spawn(?MODULE, serv2(Pid3), []),
-    Pid1 = spawn(?MODULE, serv1(Pid2), []),
+    Pid3 = spawn(?MODULE, serv3, [0]),
+    Pid2 = spawn(?MODULE, serv2, [Pid3]),
+    Pid1 = spawn(?MODULE, serv1, [Pid2]),
     
     loop(Pid1),
     loop(Pid2),
@@ -44,12 +44,11 @@ start() ->
 
  loop(P) ->
     {ok, Message} = io:read("Enter a message: "),
-    P ! Message,
-    
     if
-        Message == "all_done" ->
+        Message =:= all_done ->
             P ! halt;
-        Message =/= "all_done" ->
+        Message =/= all_done ->
+            P ! Message,
             loop(P)
     end.
 
@@ -57,12 +56,12 @@ start() ->
 serv2(Pid3) -> 
     receive
         [Head | Tail] when is_integer(Head) -> 
-            summation = sum_numbers([Head|Tail], 0),
-            io:format(">>(serv2) summation of all numbers ~p~n", [summation]),
+            Summation = sum_numbers([Head|Tail], 0),
+            io:format(">>(serv2) summation of all numbers ~p~n", [Summation]),
             serv2(Pid3);
         [Head | Tail] when is_float(Head) ->
-            product = mul_numbers([Head|Tail], 1),
-            io:format(">>(serv2) products of all numbers ~p~n", [product]),
+            Product = mul_numbers([Head|Tail], 1),
+            io:format(">>(serv2) products of all numbers ~p~n", [Product]),
             serv2(Pid3);
         halt ->
             io:format("(serv2) Forwarding halt message. ~n"),
@@ -79,7 +78,7 @@ serv2(Pid3) ->
 serv3(Count) ->
     receive
         {error, X} ->
-            io:format("(serv3) Error: ~p", [X]),
+            io:format("(serv3) Error: ~p~n", [X]),
             serv3(Count);
 
         halt->
@@ -94,14 +93,20 @@ serv3(Count) ->
 
 
 
-sum_numbers([H|T], acc) when is_number(H) ->
-    sum_numbers(T, H + acc);
+sum_numbers([H|T], Acc) when is_number(H) ->
+    sum_numbers(T, H + Acc);
 
-sum_numbers([], acc) ->
-    acc.
+sum_numbers([H|T], Acc) when not is_number(H) ->
+    sum_numbers(T, Acc);
+
+sum_numbers([], Acc) ->
+    Acc.
     
-mul_numbers([H|T], prod) when is_number(H) ->
-    mul_numbers(T, H * prod);
+mul_numbers([H|T], Prod) when is_number(H) ->
+    mul_numbers(T, H * Prod);
 
-mul_numbers([], prod) ->
-    prod.
+mul_numbers([H|T], Prod) when not is_number(H) ->
+    mul_numbers(T, Prod);
+
+mul_numbers([], Prod) ->
+    Prod.
