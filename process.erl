@@ -38,8 +38,8 @@ start() ->
     Pid1 = spawn(?MODULE, serv1, [Pid2]),
     
     loop(Pid1),
-    loop(Pid2),
-    loop(Pid3),
+    % loop(Pid2),
+    % loop(Pid3),
     okay.
 
  loop(P) ->
@@ -84,6 +84,7 @@ serv3(Count) ->
         halt->
             io:format("(serv3) Received ~p unprocessed messages.~n", [Count]),
             io:format("(serv3) Halting.~n");
+
 
         Message->
             io:format("(serv3) Not handled: ~p~n", [Message]),
