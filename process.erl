@@ -1,6 +1,6 @@
 %team("edlyn jeyaraj, yueen ma, thomas kung")
 
--module(p1).
+-module(process).
 -export([serv1/1, start/0, serv2/1, serv3/1, sum_numbers/2, mul_numbers/2]).
 
 serv1(Pid2) -> receive
